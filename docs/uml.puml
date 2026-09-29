@@ -1,0 +1,77 @@
+@startuml
+title Bridge: Shape and Renderer
+skinparam classAttributeIconSize 0
+
+package "bridge.abstraction" {
+  abstract class Shape {
+    # renderer: Renderer
+    # Shape(renderer: Renderer)
+    + draw(): void
+    + scale(factor: double): void
+    + name(): String
+    + setRenderer(renderer: Renderer): void
+  }
+
+  class Circle {
+    - center: Point
+    - radius: double
+    + Circle(center: Point, radius: double, renderer: Renderer)
+    + draw(): void
+    + scale(factor: double): void
+    + name(): String
+  }
+
+  class Square {
+    - topLeft: Point
+    - side: double
+    + Square(topLeft: Point, side: double, renderer: Renderer)
+    + draw(): void
+    + scale(factor: double): void
+    + name(): String
+    - vertices(): List<Point>
+  }
+}
+
+package "bridge.implementor" {
+  interface Renderer {
+    + renderCircle(center: Point, radius: double): void
+    + renderPolygon(vertices: List<Point>): void
+    + name(): String
+  }
+
+  class VectorRenderer {
+    + renderCircle(center: Point, radius: double): void
+    + renderPolygon(vertices: List<Point>): void
+    + name(): String
+  }
+
+  class RasterRenderer {
+    + renderCircle(center: Point, radius: double): void
+    + renderPolygon(vertices: List<Point>): void
+    + name(): String
+  }
+
+  class Point <<record>> {
+    + x: double
+    + y: double
+  }
+}
+
+package "bridge" {
+  class Main <<client>> {
+    + {static} main(args: String[]): void
+  }
+}
+
+Shape <|-- Circle
+Shape <|-- Square
+Renderer <|.. VectorRenderer
+Renderer <|.. RasterRenderer
+Shape --> Renderer : renderer (bridge)
+Circle ..> Point
+Square ..> Point
+Renderer ..> Point
+Main ..> Shape : creates and uses
+Main ..> Renderer : selects implementation
+
+@enduml
